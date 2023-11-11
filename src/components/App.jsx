@@ -5,46 +5,43 @@ import Section from './Section/Section';
 import Notification from './Notification/Notification';
 
 const App = () => {
-  const [good, setGood] = useState(0);
-  const [neutral, setNeutral] = useState(0);
-  const [bad, setBad] = useState(0);
+  const [feedback, setFeedback] = useState({ good: 0, neutral: 0, bad: 0 });
 
   const handleFeedback = type => {
-    if (type === 'good') {
-      setGood(good + 1);
-    } else if (type === 'neutral') {
-      setNeutral(neutral + 1);
-    } else if (type === 'bad') {
-      setBad(bad + 1);
-    }
+    setFeedback(prevFeedback => ({
+      ...prevFeedback,
+      [type]: prevFeedback[type] + 1,
+    }));
   };
 
-  const countTotalFeedback = () => good + neutral + bad;
+  const countTotalFeedback = () => {
+    return feedback.good + feedback.neutral + feedback.bad;
+  };
+
   const countPositiveFeedbackPercentage = () => {
     const total = countTotalFeedback();
-    return total ? ((good / total) * 100).toFixed(2) : '0';
+    return total ? ((feedback.good / total) * 100).toFixed(2) : 0;
   };
 
   const total = countTotalFeedback();
-  const positivePercentage = countPositiveFeedbackPercentage();
 
   return (
     <>
-      <Section title="Please leave feedback">
+      <Section title="Proszę o opinię">
         <FeedbackOptions onLeaveFeedback={handleFeedback} />
       </Section>
 
-      <Section title="Statistics">
-        {total > 0 ? (
+      <Section title="Statystyki">
+        {total ? (
           <Statistics
-            good={good}
-            neutral={neutral}
-            bad={bad}
+            good={feedback.good}
+            neutral={feedback.neutral}
+            bad={feedback.bad}
             total={total}
-            positivePercentage={positivePercentage}
+            positivePercentage={countPositiveFeedbackPercentage()}
           />
         ) : (
-          <Notification message="No feedback given" />
+          <Notification message="Brak opinii" />
         )}
       </Section>
     </>
